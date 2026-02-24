@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merge Tactics Strong Comps</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Merge Tactics Strong Comps</h1>
+    <p class="subtitle">Find the best card compositions</p>
+
+    <div class="filters">
+        <div class="filter-group">
+            <label>Comp Size</label>
+            <input type="number" id="compSize" value="6" min="1" max="22">
+        </div>
+        <div class="filter-group">
+            <label>Min Active Traits</label>
+            <input type="number" id="minTraits" value="0" min="0" max="14">
+        </div>
+        <div class="filter-group">
+            <label>Min Maxed Traits</label>
+            <input type="number" id="minMaxed" value="0" min="0" max="14">
+        </div>
+        <div class="filter-group">
+            <label>Sort By</label>
+            <select id="sortBy">
+                <option value="score" selected>Total Score</option>
+                <option value="maxed">Most Maxed Traits</option>
+                <option value="active">Most Active Traits</option>
+            </select>
+        </div>
+    </div>
+
+    <details class="trait-filters-dropdown">
+        <summary>Trait Filters</summary>
+        <div class="trait-filters">
+            <div class="trait-filter-section">
+                <label class="trait-filter-label">Require Maxed Traits:</label>
+                <div class="trait-checkboxes" id="require4Traits"></div>
+            </div>
+            <div class="trait-filter-section">
+                <label class="trait-filter-label">Require Active Traits (2+):</label>
+                <div class="trait-checkboxes" id="require2Traits"></div>
+            </div>
+        </div>
+    </details>
+
+    <div class="stats" id="stats"></div>
+    <div class="comp-grid" id="compGrid">
+        <div class="loading">Loading cards and generating comps...</div>
+    </div>
+
+    <script>
+        // Merge Tactics card data with traits
+        const mergeCards = [
+            { name: "Goblin Demolisher", elixir: 3, traits: ["Goblin", "Warrior"] },
+            { name: "Giant", elixir: 3, traits: ["Titan", "Superstar"] },
+            { name: "Witch", elixir: 4, traits: ["Undead", "Hinder"] },
+            { name: "Giant Skeleton", elixir: 3, traits: ["Undead", "Tank"] },
+            { name: "Prince", elixir: 4, traits: ["Noble", "Warrior"] },
+            { name: "Skeleton Dragons", elixir: 2, traits: ["Undead", "Dragon"] },
+            { name: "Wizard", elixir: 2, traits: ["Fire", "Hinder"] },
+            { name: "Pekka", elixir: 4, traits: ["Ace", "Superstar"] },
+            { name: "Musketeer", elixir: 3, traits: ["Noble", "Marksman"] },
+            { name: "Valkyrie", elixir: 3, traits: ["Clan", "Tank"] },
+            { name: "Dart Goblin", elixir: 2, traits: ["Goblin", "Marksman"] },
+            { name: "Monk", elixir: 5, traits: ["Ace", "Tank"] },
+            { name: "Barbarians", elixir: 2, traits: ["Clan", "Warrior"] },
+            { name: "Goblin Machine", elixir: 4, traits: ["Goblin", "Superstar"] },
+            { name: "Archers", elixir: 2, traits: ["Clan", "Marksman"] },
+            { name: "Skeleton King", elixir: 5, traits: ["Undead", "Warrior"] },
+            { name: "Goblins", elixir: 2, traits: ["Goblin", "Assassin"] },
+            { name: "Baby Dragon", elixir: 4, traits: ["Fire", "Dragon"] },
+            { name: "Royal Giant", elixir: 3, traits: ["Titan", "Marksman"] },
+            { name: "Knight", elixir: 2, traits: ["Noble", "Tank"] },
+            { name: "Golden Knight", elixir: 5, traits: ["Noble", "Assassin"] },
+            { name: "Archer Queen", elixir: 5, traits: ["Clan", "Superstar"] }
+        ];
+
+        // Card images (local files from card-pictures/, API fallback for Giant and Goblin Demolisher)
+        const cardImages = {
+            "Knight": "card-pictures/KnightCardMergeTactics.webp",
+            "Archers": "card-pictures/ArchersCardMergeTactics.webp",
+            "Goblins": "card-pictures/GoblinsCardMergeTactics.webp",
+            "Giant": "https://api-assets.clashroyale.com/cards/300/Axr4ox5_b7edmLsoHxBX3vmgijAIibuF6RImTbqLlXE.png",
+            "Pekka": "card-pictures/PEKKACardMergeTactics.webp",
+            "Witch": "card-pictures/WitchCardMergeTactics.webp",
+            "Barbarians": "card-pictures/BarbariansCardMergeTactics.webp",
+            "Valkyrie": "card-pictures/ValkyrieCardMergeTactics.webp",
+            "Musketeer": "card-pictures/MusketeerCardMergeTactics.webp",
+            "Baby Dragon": "card-pictures/BabyDragonCardMergeTactics.webp",
+            "Prince": "card-pictures/PrinceCardMergeTactics.webp",
+            "Wizard": "card-pictures/WizardCardMergeTactics.webp",
+            "Giant Skeleton": "card-pictures/GiantSkeletonCardMergeTactics.webp",
+            "Royal Giant": "card-pictures/RoyalGiantCardMergeTactics.webp",
+            "Dart Goblin": "card-pictures/DartGoblinCardMergeTactics.webp",
+            "Skeleton King": "card-pictures/SkeletonKingCardMergeTactics.webp",
+            "Archer Queen": "card-pictures/ArcherQueenCardMergeTactics.webp",
+            "Golden Knight": "card-pictures/GoldenKnightCardMergeTactics.webp",
+            "Monk": "card-pictures/MonkCardMergeTactics.webp",
+            "Skeleton Dragons": "card-pictures/SkeletonDragonsCardMergeTactics.webp",
+            "Goblin Demolisher": "https://api-assets.clashroyale.com/cards/300/KVVOgdn40xasFLYuQv8Go_U_LCV7wSG9q9eE1H7f3Qk.png",
+            "Goblin Machine": "card-pictures/GoblinMachineCardMergeTactics.webp"
+        };
+
+        // Trait icons (local files)
+        const traitIcons = {
+            "Ace": "trait-colors/ace_fixed.webp",
+            "Assassin": "trait-colors/assassin_fixed.webp",
+            "Clan": "trait-colors/clan_fixed.webp",
+            "Dragon": "trait-colors/dragon_fixed.webp",
+            "Fire": "trait-colors/fire_fixed.webp",
+            "Goblin": "trait-colors/goblin_fixed.webp",
+            "Hinder": "trait-colors/hinder_fixed.webp",
+            "Marksman": "trait-colors/marksman_fixed.webp",
+            "Noble": "trait-colors/noble_fixed.webp",
+            "Superstar": "trait-colors/superstar_fixed.webp",
+            "Tank": "trait-colors/tank_fixed.webp",
+            "Titan": "trait-colors/titan_fixed.webp",
+            "Undead": "trait-colors/undead_fixed.webp",
+            "Warrior": "trait-colors/warrior_fixed.webp"
+        };
+
+        function getCardImage(cardName) {
+            return cardImages[cardName] || '';
+        }
+
+        function getTraitIcon(traitName) {
+            return traitIcons[traitName] || '';
+        }
+
+        // Generate all combinations of size k from array
+        function combinations(arr, k) {
+            if (k === 0) return [[]];
+            if (arr.length === 0) return [];
+            
+            const result = [];
+            const first = arr[0];
+            const rest = arr.slice(1);
+            
+            // Combinations including first element
+            const combsWithFirst = combinations(rest, k - 1);
+            for (const comb of combsWithFirst) {
+                result.push([first, ...comb]);
+            }
+            
+            // Combinations excluding first element
+            const combsWithoutFirst = combinations(rest, k);
+            result.push(...combsWithoutFirst);
+            
+            return result;
+        }
+
+        // Calculate trait counts for a composition
+        function calculateTraits(cards) {
+            const traitCounts = {};
+            cards.forEach(card => {
+                card.traits.forEach(trait => {
+                    traitCounts[trait] = (traitCounts[trait] || 0) + 1;
+                });
+            });
+            return traitCounts;
+        }
+
+        // Calculate comp score
+        function calculateScore(traitCounts) {
+            let score = 0;
+            let activeTraits = 0;
+            let maxedTraits = 0;
+
+            for (const [trait, count] of Object.entries(traitCounts)) {
+                const maxCount = traitMaxCounts[trait] || 4;
+                
+                if (count >= maxCount) {
+                    // Maxed trait
+                    if (maxCount >= 4) {
+                        score += 6; // 4/4 = 6 points
+                    } else {
+                        score += 3; // 2/2 = 3 points
+                    }
+                    activeTraits++;
+                    maxedTraits++;
+                } else if (maxCount >= 4) {
+                    // Partial 4-troop trait
+                    if (count >= 2) {
+                        score += 2; // 2/4 = 2 points
+                        activeTraits++;
+                    }
+                }
+            }
+
+            return { score, activeTraits, maxedTraits };
+        }
+
+        // Get all unique traits
+        const allTraits = [...new Set(mergeCards.flatMap(card => card.traits))].sort();
+
+        // Calculate max possible count for each trait
+        const traitMaxCounts = {};
+        mergeCards.forEach(card => {
+            card.traits.forEach(trait => {
+                traitMaxCounts[trait] = (traitMaxCounts[trait] || 0) + 1;
+            });
+        });
+
+        // Get selected traits from checkboxes
+        function getSelectedTraits(containerId) {
+            const container = document.getElementById(containerId);
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        // Generate and filter comps
+        function generateComps(compSize, minTraits, minMaxed, require4Traits, require2Traits) {
+            const sizes = [parseInt(compSize)];
+            const comps = [];
+
+            for (const size of sizes) {
+                const combos = combinations(mergeCards, size);
+                
+                for (const combo of combos) {
+                    const traitCounts = calculateTraits(combo);
+                    const { score, activeTraits, maxedTraits } = calculateScore(traitCounts);
+
+                    if (activeTraits >= minTraits && maxedTraits >= minMaxed) {
+                        // Check required maxed traits (count == max for that trait)
+                        const hasMaxedTraits = require4Traits.every(trait => 
+                            (traitCounts[trait] || 0) >= (traitMaxCounts[trait] || 4)
+                        );
+                        if (!hasMaxedTraits) continue;
+
+                        // Check required 2+ traits
+                        const has2Traits = require2Traits.every(trait => (traitCounts[trait] || 0) >= 2);
+                        if (!has2Traits) continue;
+
+                        comps.push({
+                            cards: combo,
+                            traitCounts,
+                            score,
+                            activeTraits,
+                            maxedTraits
+                        });
+                    }
+                }
+            }
+
+            return comps;
+        }
+
+        // Sort comps
+        function sortComps(comps, sortBy) {
+            return comps.sort((a, b) => {
+                switch (sortBy) {
+                    case 'score':
+                        return b.score - a.score || b.maxedTraits - a.maxedTraits;
+                    case 'maxed':
+                        return b.maxedTraits - a.maxedTraits || b.score - a.score;
+                    case 'active':
+                        return b.activeTraits - a.activeTraits || b.score - a.score;
+                    default:
+                        return b.score - a.score;
+                }
+            });
+        }
+
+        // Trait colors for border styling
+        const traitColors = {
+            "Ace": "#a38efe",
+            "Assassin": "#ff5744",
+            "Clan": "#6ed6fe",
+            "Dragon": "#98ff64",
+            "Fire": "#f6455a",
+            "Goblin": "#97ef2d",
+            "Hinder": "#a38efe",
+            "Marksman": "#63f0cc",
+            "Noble": "#f9ca56",
+            "Superstar": "#6bd2fe",
+            "Tank": "#dce64b",
+            "Titan": "#ecf34f",
+            "Undead": "#a5ffb3",
+            "Warrior": "#cc3264"
+        };
+
+        // Render a single comp card
+        function renderComp(comp) {
+            // Find maxed traits (count equals max possible for that trait), sorted alphabetically
+            const maxedTraits = Object.entries(comp.traitCounts)
+                .filter(([trait, count]) => count >= (traitMaxCounts[trait] || 4))
+                .map(([trait]) => trait)
+                .sort();
+
+            // Find active traits (count >= 2), sorted alphabetically
+            const activeTraits = Object.entries(comp.traitCounts)
+                .filter(([trait, count]) => count >= 2)
+                .map(([trait]) => trait)
+                .sort();
+
+            // Assign each card to an active trait, prioritizing 4-troop maxed traits first
+            const usedCards = new Set();
+            const cardsByTrait = {};
+            activeTraits.forEach(trait => cardsByTrait[trait] = []);
+            
+            // Sort active traits: 4-troop maxed traits first, then by troop count desc, then alphabetical
+            const sortedActiveTraits = [...activeTraits].sort((a, b) => {
+                const aMax = traitMaxCounts[a] || 4;
+                const bMax = traitMaxCounts[b] || 4;
+                const aIsMaxed = comp.traitCounts[a] >= aMax;
+                const bIsMaxed = comp.traitCounts[b] >= bMax;
+                
+                // Prioritize 4-troop maxed traits
+                if (aMax >= 4 && aIsMaxed && !(bMax >= 4 && bIsMaxed)) return -1;
+                if (bMax >= 4 && bIsMaxed && !(aMax >= 4 && aIsMaxed)) return 1;
+                
+                // Then by max troop count descending
+                if (aMax !== bMax) return bMax - aMax;
+                
+                // Then alphabetical
+                return a.localeCompare(b);
+            });
+
+            // Helper to render a card with border only if it has an additional active trait besides the group
+            function renderCard(card, groupTrait = null) {
+                // Check if this card is part of any active trait besides the group trait
+                const cardActiveTraits = card.traits
+                    .filter(t => activeTraits.includes(t) && t !== groupTrait)
+                    .sort((a, b) => sortedActiveTraits.indexOf(a) - sortedActiveTraits.indexOf(b));
+                let borderStyle = '';
+                
+                if (cardActiveTraits.length > 0) {
+                    // Use the highest priority additional active trait's color for the border
+                    const color = traitColors[cardActiveTraits[0]] || '#fff';
+                    borderStyle = `border: 3px solid ${color};`;
+                }
+                
+                return `
+                    <div class="card-item">
+                        <img class="card-img" src="${getCardImage(card.name)}" alt="${card.name}" style="${borderStyle}" onerror="this.style.display='none'">
+                        <span class="card-name">${card.name}</span>
+                    </div>
+                `;
+            }
+            
+            comp.cards.forEach(card => {
+                // Find the highest priority active trait this card has
+                const cardActiveTraitsForGroup = card.traits
+                    .filter(t => activeTraits.includes(t))
+                    .sort((a, b) => sortedActiveTraits.indexOf(a) - sortedActiveTraits.indexOf(b));
+                if (cardActiveTraitsForGroup.length > 0 && !usedCards.has(card.name)) {
+                    cardsByTrait[cardActiveTraitsForGroup[0]].push(card);
+                    usedCards.add(card.name);
+                }
+            });
+
+            // Helper to check if card has additional active traits besides the group trait
+            function hasAdditionalTraits(card, groupTrait) {
+                return card.traits.some(t => activeTraits.includes(t) && t !== groupTrait);
+            }
+
+            // Build the groups HTML for active traits (only if they have cards), using sorted order
+            const activeGroupsHtml = sortedActiveTraits.map(trait => {
+                const traitCards = cardsByTrait[trait];
+                
+                // Only show group if it has cards
+                if (traitCards.length === 0) return '';
+                
+                // Sort cards: those with additional traits first
+                const sortedTraitCards = [...traitCards].sort((a, b) => {
+                    const aHasExtra = hasAdditionalTraits(a, trait) ? 0 : 1;
+                    const bHasExtra = hasAdditionalTraits(b, trait) ? 0 : 1;
+                    return aHasExtra - bHasExtra;
+                });
+                
+                const color = traitColors[trait] || '#fff';
+                const iconUrl = getTraitIcon(trait);
+                const iconHtml = iconUrl ? `<img class="trait-icon" src="${iconUrl}" alt="${trait}">` : '';
+                const maxCount = traitMaxCounts[trait] || 4;
+                
+                return `
+                    <div class="maxed-group" style="border-color: ${color};">
+                        <div class="maxed-group-label" style="background: ${color};">
+                            ${iconHtml}<span>${trait}</span>
+                            <span class="maxed-count">${comp.traitCounts[trait]}/${maxCount}</span>
+                        </div>
+                        <div class="maxed-group-cards">
+                            ${sortedTraitCards.map(c => renderCard(c, trait)).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Cards not in any active trait (no label, just displayed)
+            const otherCards = comp.cards.filter(card => !usedCards.has(card.name));
+            const otherCardsHtml = otherCards.length > 0 ? `
+                <div class="other-cards-row">
+                    ${otherCards.map(c => renderCard(c, null)).join('')}
+                </div>
+            ` : '';
+
+            // Partial and inactive traits (non-maxed)
+            const traitEntries = Object.entries(comp.traitCounts).sort((a, b) => b[1] - a[1]);
+
+            // Helper to build badge HTML
+            function buildBadge(trait, count, extraClass = '') {
+                const maxCount = traitMaxCounts[trait] || 4;
+                const traitClass = `trait-${trait.toLowerCase()}`;
+                const iconUrl = getTraitIcon(trait);
+                const iconHtml = iconUrl ? `<img class="trait-icon" src="${iconUrl}" alt="${trait}">` : '';
+                return `<div class="trait-badge ${traitClass} ${extraClass}">
+                    <div class="trait-line">${iconHtml}${trait}</div>
+                    <div class="trait-count">${count}/${maxCount}</div>
+                </div>`;
+            }
+
+            // Maxed traits - separate wide (4-troop) and narrow (2-troop) into different rows
+            const maxedTraitsFiltered = traitEntries
+                .filter(([trait, count]) => count >= (traitMaxCounts[trait] || 4))
+                .sort((a, b) => (traitMaxCounts[b[0]] || 4) - (traitMaxCounts[a[0]] || 4));
+            
+            const maxedWide = maxedTraitsFiltered
+                .filter(([trait]) => (traitMaxCounts[trait] || 4) >= 4)
+                .map(([trait, count]) => `<div class="traits-row">${buildBadge(trait, count, 'trait-wide')}</div>`)
+                .join('');
+            const maxedNarrow = maxedTraitsFiltered
+                .filter(([trait]) => (traitMaxCounts[trait] || 4) < 4)
+                .map(([trait, count]) => buildBadge(trait, count, ''))
+                .join('');
+            const maxedNarrowRow = maxedNarrow ? `<div class="traits-row">${maxedNarrow}</div>` : '';
+
+            // Partial traits
+            const partialTraitsFiltered = traitEntries
+                .filter(([trait, count]) => count >= 2 && count < (traitMaxCounts[trait] || 4))
+                .sort((a, b) => (traitMaxCounts[b[0]] || 4) - (traitMaxCounts[a[0]] || 4));
+            
+            const partialWide = partialTraitsFiltered
+                .filter(([trait]) => (traitMaxCounts[trait] || 4) >= 4)
+                .map(([trait, count]) => `<div class="traits-row">${buildBadge(trait, count, 'trait-partial trait-wide')}</div>`)
+                .join('');
+            const partialNarrow = partialTraitsFiltered
+                .filter(([trait]) => (traitMaxCounts[trait] || 4) < 4)
+                .map(([trait, count]) => buildBadge(trait, count, 'trait-partial'))
+                .join('');
+            const partialNarrowRow = partialNarrow ? `<div class="traits-row">${partialNarrow}</div>` : '';
+
+            // Inactive traits
+            const inactiveTraitsFiltered = traitEntries
+                .filter(([trait, count]) => count < 2)
+                .sort((a, b) => (traitMaxCounts[b[0]] || 4) - (traitMaxCounts[a[0]] || 4));
+            
+            const inactiveWide = inactiveTraitsFiltered
+                .filter(([trait]) => (traitMaxCounts[trait] || 4) >= 4)
+                .map(([trait, count]) => `<div class="traits-row">${buildBadge(trait, count, 'trait-inactive trait-wide')}</div>`)
+                .join('');
+            const inactiveNarrow = inactiveTraitsFiltered
+                .filter(([trait]) => (traitMaxCounts[trait] || 4) < 4)
+                .map(([trait, count]) => buildBadge(trait, count, 'trait-inactive'))
+                .join('');
+            const inactiveNarrowRow = inactiveNarrow ? `<div class="traits-row">${inactiveNarrow}</div>` : '';
+
+            const maxedSection = (maxedWide || maxedNarrowRow) ? `
+                <div class="traits-section">
+                    <div class="traits-section-label">Maxed</div>
+                    ${maxedWide}${maxedNarrowRow}
+                </div>` : '';
+
+            const partialSection = (partialWide || partialNarrowRow) ? `
+                <div class="traits-section">
+                    <div class="traits-section-label">Partial</div>
+                    ${partialWide}${partialNarrowRow}
+                </div>` : '';
+
+            const inactiveSection = (inactiveWide || inactiveNarrowRow) ? `
+                <div class="traits-section">
+                    <div class="traits-section-label">Other</div>
+                    ${inactiveWide}${inactiveNarrowRow}
+                </div>` : '';
+
+            return `
+                <div class="comp-card">
+                    <div class="comp-header">
+                        <div class="comp-score">Score: ${comp.score}</div>
+                    </div>
+                    <div class="maxed-groups">${activeGroupsHtml}</div>
+                    ${otherCardsHtml}
+                    ${maxedSection}
+                    ${partialSection}
+                    ${inactiveSection}
+                </div>
+            `;
+        }
+
+        // Main render function
+        function render() {
+            const compSize = document.getElementById('compSize').value;
+            const minTraits = parseInt(document.getElementById('minTraits').value);
+            const minMaxed = parseInt(document.getElementById('minMaxed').value);
+            const sortBy = document.getElementById('sortBy').value;
+            const require4Traits = getSelectedTraits('require4Traits');
+            const require2Traits = getSelectedTraits('require2Traits');
+
+            const comps = generateComps(compSize, minTraits, minMaxed, require4Traits, require2Traits);
+            const sortedComps = sortComps(comps, sortBy);
+
+            // Limit to top 100 for performance
+            const displayComps = sortedComps.slice(0, 100);
+
+            const grid = document.getElementById('compGrid');
+            const stats = document.getElementById('stats');
+
+            stats.textContent = `Found ${comps.length} strong comps (showing top ${displayComps.length})`;
+
+            if (displayComps.length === 0) {
+                grid.innerHTML = '<div class="no-results">No comps found matching your criteria. Try adjusting the filters.</div>';
+                return;
+            }
+
+            grid.innerHTML = displayComps.map(renderComp).join('');
+        }
+
+        // Populate trait checkboxes
+        function populateTraitCheckboxes() {
+            const container4 = document.getElementById('require4Traits');
+            const container2 = document.getElementById('require2Traits');
+
+            allTraits.forEach(trait => {
+                const maxCount = traitMaxCounts[trait] || 4;
+                const traitClass = `trait-${trait.toLowerCase()}`;
+                
+                // Maxed checkbox
+                const iconUrl = getTraitIcon(trait);
+                const iconHtml = iconUrl ? `<img class="trait-icon" src="${iconUrl}" alt="${trait}">` : '';
+                const label4 = document.createElement('label');
+                label4.className = 'trait-checkbox';
+                label4.innerHTML = `<input type="checkbox" value="${trait}"><span class="trait-chip ${traitClass}">${iconHtml}${trait} (${maxCount})</span>`;
+                container4.appendChild(label4);
+
+                // Active checkbox
+                const label2 = document.createElement('label');
+                label2.className = 'trait-checkbox';
+                label2.innerHTML = `<input type="checkbox" value="${trait}"><span class="trait-chip ${traitClass}">${iconHtml}${trait}</span>`;
+                container2.appendChild(label2);
+            });
+        }
+
+        // Initialize
+        function init() {
+            populateTraitCheckboxes();
+            render();
+
+            // Add event listeners
+            document.getElementById('compSize').addEventListener('change', render);
+            document.getElementById('minTraits').addEventListener('change', render);
+            document.getElementById('minMaxed').addEventListener('change', render);
+            document.getElementById('sortBy').addEventListener('change', render);
+            document.getElementById('require4Traits').addEventListener('change', render);
+            document.getElementById('require2Traits').addEventListener('change', render);
+        }
+
+        init();
+    </script>
+</body>
+</html>

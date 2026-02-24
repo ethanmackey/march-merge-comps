@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merge Tactics - Trait Explorer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Trait Badges Section */
+        .traits-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+        }
+
+        .trait-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .trait-badge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .trait-badge .trait-icon {
+            height: 20px;
+            width: auto;
+        }
+
+        .trait-badge .trait-count {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-left: 4px;
+        }
+
+        /* Cards Grid */
+        .cards-container {
+            position: relative;
+            min-height: 400px;
+            padding: 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+        }
+
+        .cards-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            border-radius: 12px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .card-item.highlighted {
+            background: rgba(255, 215, 0, 0.15);
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+            order: -1 !important;
+        }
+
+        .card-item.dimmed {
+            opacity: 0.3;
+            transform: scale(0.9);
+        }
+
+        .card-img {
+            width: 80px;
+            height: 96px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            padding: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .card-item.highlighted .card-img {
+            border: 3px solid;
+        }
+
+        .card-name {
+            font-size: 11px;
+            color: #ccc;
+            text-align: center;
+            max-width: 85px;
+        }
+
+        .card-traits {
+            display: flex;
+            gap: 4px;
+        }
+
+        .card-trait-icon {
+            height: 16px;
+            width: auto;
+            opacity: 0.7;
+        }
+
+        .card-item.highlighted .card-trait-icon {
+            opacity: 1;
+        }
+
+        /* Highlighted group wrapper */
+        .group-label {
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .group-label.show {
+            display: block;
+        }
+
+        /* Trait colors */
+        .trait-ace { background: #a38efe; color: #000; }
+        .trait-assassin { background: #ff5744; color: #fff; }
+        .trait-clan { background: #6ed6fe; color: #000; }
+        .trait-dragon { background: #98ff64; color: #000; }
+        .trait-fire { background: #f6455a; color: #fff; }
+        .trait-goblin { background: #97ef2d; color: #000; }
+        .trait-hinder { background: #a38efe; color: #000; }
+        .trait-marksman { background: #63f0cc; color: #000; }
+        .trait-noble { background: #f9ca56; color: #000; }
+        .trait-superstar { background: #6bd2fe; color: #000; }
+        .trait-tank { background: #dce64b; color: #000; }
+        .trait-titan { background: #ecf34f; color: #000; }
+        .trait-undead { background: #a5ffb3; color: #000; }
+        .trait-warrior { background: #cc3264; color: #fff; }
+
+        /* Instructions */
+        .instructions {
+            text-align: center;
+            color: #888;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* Divider between highlighted and other cards */
+        .cards-divider {
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            margin: 15px 0;
+            display: none;
+            order: 0;
+        }
+
+        .cards-divider.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>⚔️ Merge Tactics - Trait Explorer</h1>
+    <p class="subtitle">Hover over a trait to see which cards have it</p>
+
+    <div class="main-container">
+        <p class="instructions">Hover over any trait badge below to highlight cards with that trait</p>
+        
+        <div class="traits-bar" id="traitsBar"></div>
+        
+        <div class="cards-container">
+            <div class="cards-grid" id="cardsGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        // Card data
+        const mergeCards = [
+            { name: "Goblin Demolisher", elixir: 3, traits: ["Goblin", "Warrior"] },
+            { name: "Giant", elixir: 3, traits: ["Titan", "Superstar"] },
+            { name: "Witch", elixir: 4, traits: ["Undead", "Hinder"] },
+            { name: "Giant Skeleton", elixir: 3, traits: ["Undead", "Tank"] },
+            { name: "Prince", elixir: 4, traits: ["Noble", "Warrior"] },
+            { name: "Skeleton Dragons", elixir: 2, traits: ["Undead", "Dragon"] },
+            { name: "Wizard", elixir: 2, traits: ["Fire", "Hinder"] },
+            { name: "Pekka", elixir: 4, traits: ["Ace", "Superstar"] },
+            { name: "Musketeer", elixir: 3, traits: ["Noble", "Marksman"] },
+            { name: "Valkyrie", elixir: 3, traits: ["Clan", "Tank"] },
+            { name: "Dart Goblin", elixir: 2, traits: ["Goblin", "Marksman"] },
+            { name: "Monk", elixir: 5, traits: ["Ace", "Tank"] },
+            { name: "Barbarians", elixir: 2, traits: ["Clan", "Warrior"] },
+            { name: "Goblin Machine", elixir: 4, traits: ["Goblin", "Superstar"] },
+            { name: "Archers", elixir: 2, traits: ["Clan", "Marksman"] },
+            { name: "Skeleton King", elixir: 5, traits: ["Undead", "Warrior"] },
+            { name: "Goblins", elixir: 2, traits: ["Goblin", "Assassin"] },
+            { name: "Baby Dragon", elixir: 4, traits: ["Fire", "Dragon"] },
+            { name: "Royal Giant", elixir: 3, traits: ["Titan", "Marksman"] },
+            { name: "Knight", elixir: 2, traits: ["Noble", "Tank"] },
+            { name: "Golden Knight", elixir: 5, traits: ["Noble", "Assassin"] },
+            { name: "Archer Queen", elixir: 5, traits: ["Clan", "Superstar"] }
+        ];
+
+        // Card images
+        const cardImages = {
+            "Knight": "card-pictures/KnightCardMergeTactics.webp",
+            "Archers": "card-pictures/ArchersCardMergeTactics.webp",
+            "Goblins": "card-pictures/GoblinsCardMergeTactics.webp",
+            "Giant": "https://api-assets.clashroyale.com/cards/300/Axr4ox5_b7edmLsoHxBX3vmgijAIibuF6RImTbqLlXE.png",
+            "Pekka": "card-pictures/PEKKACardMergeTactics.webp",
+            "Witch": "card-pictures/WitchCardMergeTactics.webp",
+            "Barbarians": "card-pictures/BarbariansCardMergeTactics.webp",
+            "Valkyrie": "card-pictures/ValkyrieCardMergeTactics.webp",
+            "Musketeer": "card-pictures/MusketeerCardMergeTactics.webp",
+            "Baby Dragon": "card-pictures/BabyDragonCardMergeTactics.webp",
+            "Prince": "card-pictures/PrinceCardMergeTactics.webp",
+            "Wizard": "card-pictures/WizardCardMergeTactics.webp",
+            "Giant Skeleton": "card-pictures/GiantSkeletonCardMergeTactics.webp",
+            "Royal Giant": "card-pictures/RoyalGiantCardMergeTactics.webp",
+            "Dart Goblin": "card-pictures/DartGoblinCardMergeTactics.webp",
+            "Skeleton King": "card-pictures/SkeletonKingCardMergeTactics.webp",
+            "Archer Queen": "card-pictures/ArcherQueenCardMergeTactics.webp",
+            "Golden Knight": "card-pictures/GoldenKnightCardMergeTactics.webp",
+            "Monk": "card-pictures/MonkCardMergeTactics.webp",
+            "Skeleton Dragons": "card-pictures/SkeletonDragonsCardMergeTactics.webp",
+            "Goblin Demolisher": "https://api-assets.clashroyale.com/cards/300/KVVOgdn40xasFLYuQv8Go_U_LCV7wSG9q9eE1H7f3Qk.png",
+            "Goblin Machine": "card-pictures/GoblinMachineCardMergeTactics.webp"
+        };
+
+        // Trait icons
+        const traitIcons = {
+            "Ace": "trait-colors/ace_fixed.webp",
+            "Assassin": "trait-colors/assassin_fixed.webp",
+            "Clan": "trait-colors/clan_fixed.webp",
+            "Dragon": "trait-colors/dragon_fixed.webp",
+            "Fire": "trait-colors/fire_fixed.webp",
+            "Goblin": "trait-colors/goblin_fixed.webp",
+            "Hinder": "trait-colors/hinder_fixed.webp",
+            "Marksman": "trait-colors/marksman_fixed.webp",
+            "Noble": "trait-colors/noble_fixed.webp",
+            "Superstar": "trait-colors/superstar_fixed.webp",
+            "Tank": "trait-colors/tank_fixed.webp",
+            "Titan": "trait-colors/titan_fixed.webp",
+            "Undead": "trait-colors/undead_fixed.webp",
+            "Warrior": "trait-colors/warrior_fixed.webp"
+        };
+
+        // Trait colors for borders
+        const traitColors = {
+            "Ace": "#a38efe",
+            "Assassin": "#ff5744",
+            "Clan": "#6ed6fe",
+            "Dragon": "#98ff64",
+            "Fire": "#f6455a",
+            "Goblin": "#97ef2d",
+            "Hinder": "#a38efe",
+            "Marksman": "#63f0cc",
+            "Noble": "#f9ca56",
+            "Superstar": "#6bd2fe",
+            "Tank": "#dce64b",
+            "Titan": "#ecf34f",
+            "Undead": "#a5ffb3",
+            "Warrior": "#cc3264"
+        };
+
+        // Get all unique traits with counts
+        const traitCounts = {};
+        mergeCards.forEach(card => {
+            card.traits.forEach(trait => {
+                traitCounts[trait] = (traitCounts[trait] || 0) + 1;
+            });
+        });
+
+        const allTraits = Object.keys(traitCounts).sort();
+
+        // Render trait badges
+        function renderTraitBadges() {
+            const container = document.getElementById('traitsBar');
+            
+            container.innerHTML = allTraits.map(trait => {
+                const traitClass = `trait-${trait.toLowerCase()}`;
+                const iconUrl = traitIcons[trait] || '';
+                const iconHtml = iconUrl ? `<img class="trait-icon" src="${iconUrl}" alt="${trait}">` : '';
+                const count = traitCounts[trait];
+                
+                return `
+                    <div class="trait-badge ${traitClass}" 
+                         data-trait="${trait}"
+                         onmouseenter="highlightTrait('${trait}')"
+                         onmouseleave="clearHighlight()">
+                        ${iconHtml}
+                        <span>${trait}</span>
+                        <span class="trait-count">(${count})</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render all cards
+        function renderCards() {
+            const container = document.getElementById('cardsGrid');
+            
+            container.innerHTML = mergeCards.map((card, index) => {
+                const imgUrl = cardImages[card.name] || '';
+                const traitIconsHtml = card.traits.map(trait => {
+                    const iconUrl = traitIcons[trait] || '';
+                    return iconUrl ? `<img class="card-trait-icon" src="${iconUrl}" alt="${trait}" title="${trait}">` : '';
+                }).join('');
+                
+                return `
+                    <div class="card-item" data-card="${card.name}" data-traits="${card.traits.join(',')}" data-index="${index}">
+                        <img class="card-img" src="${imgUrl}" alt="${card.name}" onerror="this.style.display='none'">
+                        <span class="card-name">${card.name}</span>
+                        <div class="card-traits">${traitIconsHtml}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Highlight cards with a specific trait
+        function highlightTrait(trait) {
+            const cards = document.querySelectorAll('.card-item');
+            const color = traitColors[trait];
+            
+            cards.forEach(card => {
+                const cardTraits = card.dataset.traits.split(',');
+                
+                if (cardTraits.includes(trait)) {
+                    card.classList.add('highlighted');
+                    card.classList.remove('dimmed');
+                    // Set the border color to the trait color
+                    card.querySelector('.card-img').style.borderColor = color;
+                } else {
+                    card.classList.add('dimmed');
+                    card.classList.remove('highlighted');
+                }
+            });
+        }
+
+        // Clear all highlights
+        function clearHighlight() {
+            const cards = document.querySelectorAll('.card-item');
+            
+            cards.forEach(card => {
+                card.classList.remove('highlighted', 'dimmed');
+                card.querySelector('.card-img').style.borderColor = '';
+            });
+        }
+
+        // Initialize
+        renderTraitBadges();
+        renderCards();
+    </script>
+</body>
+</html>

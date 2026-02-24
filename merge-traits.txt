@@ -1,0 +1,23 @@
+Card Name, Elixir Cost, Trait 1, Trait 2
+Goblin Demolisher, 3, Goblin, Warrior
+Giant, 3, Titan, Superstar
+Witch, 4, Undead, Hinder
+Giant Skeleton, 3, Undead, Tank
+Prince, 4, Noble, Warrior
+Skeleton Dragons, 2, Undead, Dragon
+Wizard, 2, Fire, Hinder
+Pekka, 4, Ace, Superstar
+Musketeer, 3, Noble, Marksman
+Valkyrie, 3, Clan, Tank
+Dart Goblin, 2, Goblin, Marksman
+Monk, 5, Ace, Tank
+Barbarians, 2, Clan, Warrior
+Goblin Machine, 4, Goblin, Superstar
+Archers, 2, Clan, Marksman
+Skeleton King, 5, Undead, Warrior
+Goblins, 2, Goblin, Assassin
+Baby Dragon, 4, Fire, Dragon
+Royal Giant, 3, Titan, Marksman
+Knight, 2, Noble, Tank
+Golden Knight, 5, Noble, Assassin
+Archer Queen, 5, Clan, Superstar
