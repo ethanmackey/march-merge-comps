@@ -302,19 +302,22 @@
             const cardsByTrait = {};
             activeTraits.forEach(trait => cardsByTrait[trait] = []);
             
-            // Sort active traits: 4-troop maxed traits first, then by troop count desc, then alphabetical
+            // Sort active traits: maxed traits first (4/4, then 2/2), then partial traits, then alphabetical
             const sortedActiveTraits = [...activeTraits].sort((a, b) => {
                 const aMax = traitMaxCounts[a] || 4;
                 const bMax = traitMaxCounts[b] || 4;
                 const aIsMaxed = comp.traitCounts[a] >= aMax;
                 const bIsMaxed = comp.traitCounts[b] >= bMax;
                 
-                // Prioritize 4-troop maxed traits
-                if (aMax >= 4 && aIsMaxed && !(bMax >= 4 && bIsMaxed)) return -1;
-                if (bMax >= 4 && bIsMaxed && !(aMax >= 4 && aIsMaxed)) return 1;
+                // Prioritize maxed traits over partial traits
+                if (aIsMaxed && !bIsMaxed) return -1;
+                if (bIsMaxed && !aIsMaxed) return 1;
                 
-                // Then by max troop count descending
-                if (aMax !== bMax) return bMax - aMax;
+                // Among maxed traits, prioritize higher max count (4/4 before 2/2)
+                if (aIsMaxed && bIsMaxed && aMax !== bMax) return bMax - aMax;
+                
+                // Among partial traits, prioritize higher max count
+                if (!aIsMaxed && !bIsMaxed && aMax !== bMax) return bMax - aMax;
                 
                 // Then alphabetical
                 return a.localeCompare(b);
@@ -365,11 +368,11 @@
                 // Only show group if it has cards
                 if (traitCards.length === 0) return '';
                 
-                // Sort cards: those with additional traits first
+                // Sort cards: alphabetically by their other trait (not the group trait)
                 const sortedTraitCards = [...traitCards].sort((a, b) => {
-                    const aHasExtra = hasAdditionalTraits(a, trait) ? 0 : 1;
-                    const bHasExtra = hasAdditionalTraits(b, trait) ? 0 : 1;
-                    return aHasExtra - bHasExtra;
+                    const aOtherTrait = a.traits.find(t => t !== trait) || '';
+                    const bOtherTrait = b.traits.find(t => t !== trait) || '';
+                    return aOtherTrait.localeCompare(bOtherTrait);
                 });
                 
                 const color = traitColors[trait] || '#fff';
