@@ -1,0 +1,468 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+h1 {
+    text-align: center;
+    color: #ffd700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #aaa;
+    margin-bottom: 30px;
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group label {
+    font-size: 12px;
+    color: #aaa;
+}
+
+select, input[type="number"] {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background: #2a2a4a;
+    color: #fff;
+    font-size: 14px;
+}
+
+.stats {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #888;
+}
+
+.comp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.comp-card {
+    background: linear-gradient(145deg, #2a2a4a 0%, #1a1a3a 100%);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 1px solid #3a3a5a;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.comp-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+.comp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #3a3a5a;
+}
+
+.comp-score {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.comp-elixir {
+    background: #e040fb;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.cards-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+/* Maxed trait groups */
+.maxed-groups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+.maxed-group {
+    border: 2px solid;
+    border-radius: 12px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.maxed-group-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 8px;
+    justify-content: center;
+}
+
+.maxed-group-label .trait-icon {
+    height: 16px;
+    width: auto;
+}
+
+.maxed-group-label .maxed-count {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-left: auto;
+}
+
+.maxed-group-cards {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Other cards section */
+.other-cards {
+    margin-bottom: 15px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.other-cards-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.other-cards-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.card-img {
+    width: 60px;
+    height: 72px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.3);
+    padding: 3px;
+}
+
+.card-name {
+    font-size: 10px;
+    color: #aaa;
+    text-align: center;
+    max-width: 65px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-maxed-border {
+    border-radius: 8px;
+}
+
+.traits-section {
+    margin-bottom: 10px;
+}
+
+.traits-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+.traits-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.traits-row {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+.traits-row:last-child {
+    margin-bottom: 0;
+}
+
+.trait-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 70px;
+}
+
+.trait-badge.trait-wide {
+    min-width: 140px;
+}
+
+.trait-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.trait-count {
+    font-size: 11px;
+    opacity: 0.9;
+}
+
+.trait-icon {
+    height: 16px;
+    width: auto;
+    vertical-align: middle;
+    margin-right: 2px;
+    object-fit: contain;
+}
+
+/* Trait-specific colors */
+.trait-ace { background: #a38efe; color: #000; }
+.trait-assassin { background: #ff5744; color: #fff; }
+.trait-clan { background: #6ed6fe; color: #000; }
+.trait-dragon { background: #98ff64; color: #000; }
+.trait-fire { background: #f6455a; color: #fff; }
+.trait-goblin { background: #97ef2d; color: #000; }
+.trait-hinder { background: #a38efe; color: #000; }
+.trait-marksman { background: #63f0cc; color: #000; }
+.trait-noble { background: #f9ca56; color: #000; }
+.trait-superstar { background: #6bd2fe; color: #000; }
+.trait-tank { background: #dce64b; color: #000; }
+.trait-titan { background: #ecf34f; color: #000; }
+.trait-undead { background: #a5ffb3; color: #000; }
+.trait-warrior { background: #cc3264; color: #fff; }
+
+/* Partial trait (2+) - slightly dimmed */
+.trait-partial {
+    opacity: 0.75;
+}
+
+.trait-inactive {
+    background: rgba(255,255,255,0.1);
+    color: #666;
+}
+
+.no-results {
+    text-align: center;
+    padding: 50px;
+    color: #666;
+    font-size: 18px;
+}
+
+.loading {
+    text-align: center;
+    padding: 50px;
+    color: #ffd700;
+    font-size: 18px;
+}
+
+.trait-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.legend-2 {
+    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+}
+
+.legend-4 {
+    background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+}
+
+/* Trait filters dropdown */
+.trait-filters-dropdown {
+    max-width: 1200px;
+    margin: 0 auto 30px;
+}
+
+.trait-filters-dropdown summary {
+    cursor: pointer;
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    border: 1px solid #3a3a5a;
+    color: #ffd700;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.trait-filters-dropdown summary:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.trait-filters-dropdown[open] summary {
+    border-radius: 10px 10px 0 0;
+    border-bottom: none;
+}
+
+.trait-filters-dropdown[open] .trait-filters {
+    border-radius: 0 0 10px 10px;
+    margin: 0;
+}
+
+/* Trait filter sections */
+.trait-filters {
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    border: 1px solid #3a3a5a;
+}
+
+.trait-filter-section {
+    margin-bottom: 15px;
+}
+
+.trait-filter-section:last-child {
+    margin-bottom: 0;
+}
+
+.trait-filter-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #aaa;
+    margin-bottom: 10px;
+}
+
+.trait-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.trait-checkbox {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.trait-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.trait-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    opacity: 0.5;
+}
+
+/* Trait chip colors (dimmed state) */
+.trait-chip.trait-ace { background: rgba(74, 0, 128, 0.3); color: #9b59b6; border-color: rgba(74, 0, 128, 0.5); }
+.trait-chip.trait-assassin { background: rgba(220, 38, 38, 0.3); color: #f87171; border-color: rgba(220, 38, 38, 0.5); }
+.trait-chip.trait-clan { background: rgba(125, 211, 252, 0.3); color: #7dd3fc; border-color: rgba(125, 211, 252, 0.5); }
+.trait-chip.trait-dragon { background: rgba(163, 230, 53, 0.3); color: #a3e635; border-color: rgba(163, 230, 53, 0.5); }
+.trait-chip.trait-fire { background: rgba(220, 38, 38, 0.3); color: #f87171; border-color: rgba(220, 38, 38, 0.5); }
+.trait-chip.trait-goblin { background: rgba(34, 197, 94, 0.3); color: #22c55e; border-color: rgba(34, 197, 94, 0.5); }
+.trait-chip.trait-hinder { background: rgba(74, 0, 128, 0.3); color: #9b59b6; border-color: rgba(74, 0, 128, 0.5); }
+.trait-chip.trait-marksman { background: rgba(34, 211, 238, 0.3); color: #22d3ee; border-color: rgba(34, 211, 238, 0.5); }
+.trait-chip.trait-noble { background: rgba(255, 215, 0, 0.3); color: #ffd700; border-color: rgba(255, 215, 0, 0.5); }
+.trait-chip.trait-superstar { background: rgba(59, 130, 246, 0.3); color: #3b82f6; border-color: rgba(59, 130, 246, 0.5); }
+.trait-chip.trait-tank { background: rgba(250, 204, 21, 0.3); color: #facc15; border-color: rgba(250, 204, 21, 0.5); }
+.trait-chip.trait-titan { background: rgba(250, 204, 21, 0.3); color: #facc15; border-color: rgba(250, 204, 21, 0.5); }
+.trait-chip.trait-undead { background: rgba(34, 211, 238, 0.3); color: #22d3ee; border-color: rgba(34, 211, 238, 0.5); }
+.trait-chip.trait-warrior { background: rgba(220, 38, 38, 0.3); color: #f87171; border-color: rgba(220, 38, 38, 0.5); }
+
+/* Selected trait chips - full color with glow */
+.trait-checkbox input[type="checkbox"]:checked + .trait-chip {
+    opacity: 1;
+    box-shadow: 0 0 12px currentColor;
+}
+
+.trait-chip:hover {
+    transform: scale(1.05);
+    opacity: 0.8;
+}
