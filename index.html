@@ -302,7 +302,7 @@
             const cardsByTrait = {};
             activeTraits.forEach(trait => cardsByTrait[trait] = []);
             
-            // Sort active traits: maxed traits first (4/4, then 2/2), then partial traits, then alphabetical
+            // Sort active traits: maxed traits first (4/4, then 2/2), then partial traits alphabetically
             const sortedActiveTraits = [...activeTraits].sort((a, b) => {
                 const aMax = traitMaxCounts[a] || 4;
                 const bMax = traitMaxCounts[b] || 4;
@@ -316,10 +316,7 @@
                 // Among maxed traits, prioritize higher max count (4/4 before 2/2)
                 if (aIsMaxed && bIsMaxed && aMax !== bMax) return bMax - aMax;
                 
-                // Among partial traits, prioritize higher max count
-                if (!aIsMaxed && !bIsMaxed && aMax !== bMax) return bMax - aMax;
-                
-                // Then alphabetical
+                // Alphabetical (for both maxed traits of same size and partial traits)
                 return a.localeCompare(b);
             });
 
@@ -419,7 +416,14 @@
             // Maxed traits - separate wide (4-troop) and narrow (2-troop) into different rows
             const maxedTraitsFiltered = traitEntries
                 .filter(([trait, count]) => count >= (traitMaxCounts[trait] || 4))
-                .sort((a, b) => (traitMaxCounts[b[0]] || 4) - (traitMaxCounts[a[0]] || 4));
+                .sort((a, b) => {
+                    const aMax = traitMaxCounts[a[0]] || 4;
+                    const bMax = traitMaxCounts[b[0]] || 4;
+                    // 4/4 traits first, then 2/2
+                    if (aMax !== bMax) return bMax - aMax;
+                    // Then alphabetically
+                    return a[0].localeCompare(b[0]);
+                });
             
             const maxedWide = maxedTraitsFiltered
                 .filter(([trait]) => (traitMaxCounts[trait] || 4) >= 4)
@@ -434,7 +438,7 @@
             // Partial traits
             const partialTraitsFiltered = traitEntries
                 .filter(([trait, count]) => count >= 2 && count < (traitMaxCounts[trait] || 4))
-                .sort((a, b) => (traitMaxCounts[b[0]] || 4) - (traitMaxCounts[a[0]] || 4));
+                .sort((a, b) => a[0].localeCompare(b[0]));
             
             const partialWide = partialTraitsFiltered
                 .filter(([trait]) => (traitMaxCounts[trait] || 4) >= 4)
@@ -449,7 +453,7 @@
             // Inactive traits
             const inactiveTraitsFiltered = traitEntries
                 .filter(([trait, count]) => count < 2)
-                .sort((a, b) => (traitMaxCounts[b[0]] || 4) - (traitMaxCounts[a[0]] || 4));
+                .sort((a, b) => a[0].localeCompare(b[0]));
             
             const inactiveWide = inactiveTraitsFiltered
                 .filter(([trait]) => (traitMaxCounts[trait] || 4) >= 4)
