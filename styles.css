@@ -13,7 +13,7 @@ body {
 
 h1 {
     text-align: center;
-    color: #ffd700;
+    color: white;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     margin-bottom: 10px;
 }
@@ -27,32 +27,50 @@ h1 {
 .filters {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
     flex-wrap: wrap;
-    margin-bottom: 30px;
-    padding: 20px;
+    margin-bottom: 20px;
+    padding: 10px 15px;
     background: rgba(255,255,255,0.1);
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 3px;
 }
 
 .filter-group label {
-    font-size: 12px;
+    font-size: 11px;
     color: #aaa;
 }
 
 select, input[type="number"] {
-    padding: 8px 12px;
+    padding: 5px 10px;
     border-radius: 5px;
     border: 1px solid #444;
     background: #2a2a4a;
     color: #fff;
-    font-size: 14px;
+    font-size: 13px;
+}
+
+.scoring-key {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: #aaa;
+    width: 100%;
+    justify-content: center;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.scoring-key span:first-child {
+    font-weight: bold;
+    color: #fff;
 }
 
 .stats {
@@ -95,7 +113,7 @@ select, input[type="number"] {
 .comp-score {
     font-size: 24px;
     font-weight: bold;
-    color: #ffd700;
+    color: white;
 }
 
 .comp-elixir {
@@ -290,10 +308,10 @@ select, input[type="number"] {
 
 /* Trait-specific colors */
 .trait-ace { background: #a38efe; color: #000; }
-.trait-assassin { background: #ff5744; color: #fff; }
+.trait-assassin { background: #ff5744; color: #000; }
 .trait-clan { background: #6ed6fe; color: #000; }
 .trait-dragon { background: #98ff64; color: #000; }
-.trait-fire { background: #f6455a; color: #fff; }
+.trait-fire { background: #f6455a; color: #000; }
 .trait-goblin { background: #97ef2d; color: #000; }
 .trait-hinder { background: #a38efe; color: #000; }
 .trait-marksman { background: #63f0cc; color: #000; }
@@ -302,7 +320,7 @@ select, input[type="number"] {
 .trait-tank { background: #dce64b; color: #000; }
 .trait-titan { background: #ecf34f; color: #000; }
 .trait-undead { background: #a5ffb3; color: #000; }
-.trait-warrior { background: #cc3264; color: #fff; }
+.trait-warrior { background: #cc3264; color: #000; }
 
 /* Partial trait (2+) - slightly dimmed */
 .trait-partial {
@@ -369,7 +387,7 @@ select, input[type="number"] {
     background: rgba(255,255,255,0.1);
     border-radius: 10px;
     border: 1px solid #3a3a5a;
-    color: #ffd700;
+    color: white;
     font-weight: 600;
     font-size: 14px;
 }
@@ -456,10 +474,11 @@ select, input[type="number"] {
 .trait-chip.trait-undead { background: rgba(34, 211, 238, 0.3); color: #22d3ee; border-color: rgba(34, 211, 238, 0.5); }
 .trait-chip.trait-warrior { background: rgba(220, 38, 38, 0.3); color: #f87171; border-color: rgba(220, 38, 38, 0.5); }
 
-/* Selected trait chips - full color with glow */
+/* Selected trait chips - full color with outline */
 .trait-checkbox input[type="checkbox"]:checked + .trait-chip {
     opacity: 1;
-    box-shadow: 0 0 12px currentColor;
+    outline: 3px solid currentColor;
+    outline-offset: -2px;
 }
 
 .trait-chip:hover {

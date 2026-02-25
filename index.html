@@ -7,21 +7,12 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Merge Tactics Strong Comps</h1>
-    <p class="subtitle">Find the best card compositions</p>
+    <h1>Merge Tactics March Season Comps</h1>
 
     <div class="filters">
         <div class="filter-group">
             <label>Comp Size</label>
             <input type="number" id="compSize" value="6" min="1" max="22">
-        </div>
-        <div class="filter-group">
-            <label>Min Active Traits</label>
-            <input type="number" id="minTraits" value="0" min="0" max="14">
-        </div>
-        <div class="filter-group">
-            <label>Min Maxed Traits</label>
-            <input type="number" id="minMaxed" value="0" min="0" max="14">
         </div>
         <div class="filter-group">
             <label>Sort By</label>
@@ -30,6 +21,11 @@
                 <option value="maxed">Most Maxed Traits</option>
                 <option value="active">Most Active Traits</option>
             </select>
+        </div>
+        <div class="scoring-key">
+            <span>Scoring:</span>
+            <span>4/4 = 4pts</span>
+            <span>2/2 or 2/4 = 2pts</span>
         </div>
     </div>
 
@@ -176,9 +172,9 @@
                 if (count >= maxCount) {
                     // Maxed trait
                     if (maxCount >= 4) {
-                        score += 6; // 4/4 = 6 points
+                        score += 4; // 4/4 = 4 points
                     } else {
-                        score += 3; // 2/2 = 3 points
+                        score += 2; // 2/2 = 2 points
                     }
                     activeTraits++;
                     maxedTraits++;
@@ -500,13 +496,11 @@
         // Main render function
         function render() {
             const compSize = document.getElementById('compSize').value;
-            const minTraits = parseInt(document.getElementById('minTraits').value);
-            const minMaxed = parseInt(document.getElementById('minMaxed').value);
             const sortBy = document.getElementById('sortBy').value;
             const require4Traits = getSelectedTraits('require4Traits');
             const require2Traits = getSelectedTraits('require2Traits');
 
-            const comps = generateComps(compSize, minTraits, minMaxed, require4Traits, require2Traits);
+            const comps = generateComps(compSize, 0, 0, require4Traits, require2Traits);
             const sortedComps = sortComps(comps, sortBy);
 
             // Limit to top 100 for performance
@@ -515,7 +509,7 @@
             const grid = document.getElementById('compGrid');
             const stats = document.getElementById('stats');
 
-            stats.textContent = `Found ${comps.length} strong comps (showing top ${displayComps.length})`;
+            stats.textContent = `Found ${comps.length} comps (showing top ${displayComps.length})`;
 
             if (displayComps.length === 0) {
                 grid.innerHTML = '<div class="no-results">No comps found matching your criteria. Try adjusting the filters.</div>';
@@ -542,11 +536,13 @@
                 label4.innerHTML = `<input type="checkbox" value="${trait}"><span class="trait-chip ${traitClass}">${iconHtml}${trait} (${maxCount})</span>`;
                 container4.appendChild(label4);
 
-                // Active checkbox
-                const label2 = document.createElement('label');
-                label2.className = 'trait-checkbox';
-                label2.innerHTML = `<input type="checkbox" value="${trait}"><span class="trait-chip ${traitClass}">${iconHtml}${trait}</span>`;
-                container2.appendChild(label2);
+                // Active checkbox (only for 4-troop traits)
+                if (maxCount >= 4) {
+                    const label2 = document.createElement('label');
+                    label2.className = 'trait-checkbox';
+                    label2.innerHTML = `<input type="checkbox" value="${trait}"><span class="trait-chip ${traitClass}">${iconHtml}${trait}</span>`;
+                    container2.appendChild(label2);
+                }
             });
         }
 
@@ -557,8 +553,6 @@
 
             // Add event listeners
             document.getElementById('compSize').addEventListener('change', render);
-            document.getElementById('minTraits').addEventListener('change', render);
-            document.getElementById('minMaxed').addEventListener('change', render);
             document.getElementById('sortBy').addEventListener('change', render);
             document.getElementById('require4Traits').addEventListener('change', render);
             document.getElementById('require2Traits').addEventListener('change', render);
